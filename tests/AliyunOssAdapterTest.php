@@ -1,6 +1,6 @@
 <?php
 
-namespace ApolloPY\Flysystem\AliyunOss\Tests;
+namespace Xsilen\Flysystem\AliyunOss\Tests;
 
 use OSS\OssClient;
 use PHPUnit_Framework_TestCase;

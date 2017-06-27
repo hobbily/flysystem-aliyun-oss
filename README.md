@@ -4,10 +4,12 @@ This is a Flysystem adapter for the Aliyun OSS ~2.2.1
 
 inspire by [aobozhang/aliyun-oss-adapter](https://github.com/aobozhang/aliyun-oss-adapter)
 
+inspire by [apollopy/flysystem-aliyun-oss](https://github.com/apollopy/flysystem-aliyun-oss)
+
 ## Installation
 
 ```bash
-composer require apollopy/flysystem-aliyun-oss
+composer require xsilen/flysystem-aliyun-oss
 ```
 
 ## for Laravel

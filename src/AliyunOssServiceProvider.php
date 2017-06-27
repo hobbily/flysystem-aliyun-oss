@@ -1,6 +1,6 @@
 <?php
 
-namespace ApolloPY\Flysystem\AliyunOss;
+namespace Xsilen\Flysystem\AliyunOss;
 
 use Storage;
 use OSS\OssClient;

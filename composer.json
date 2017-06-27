@@ -1,11 +1,11 @@
 {
-  "name": "apollopy/flysystem-aliyun-oss",
+  "name": "xsilen/flysystem-aliyun-oss",
   "description": "This is a Flysystem adapter for the Aliyun OSS ~2.2.1",
   "license": "MIT",
   "authors": [
     {
-      "name": "ApolloPY",
-      "email": "ApolloPY@Gmail.com"
+      "name": "xsilen",
+      "email": "xsilen@163.com"
     }
   ],
   "require": {

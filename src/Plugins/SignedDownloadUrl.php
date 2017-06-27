@@ -1,6 +1,6 @@
 <?php
 
-namespace ApolloPY\Flysystem\AliyunOss\Plugins;
+namespace Xsilen\Flysystem\AliyunOss\Plugins;
 
 use League\Flysystem\Plugin\AbstractPlugin;
 
