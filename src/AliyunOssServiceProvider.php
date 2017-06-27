@@ -6,8 +6,8 @@ use Storage;
 use OSS\OssClient;
 use League\Flysystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
-use ApolloPY\Flysystem\AliyunOss\Plugins\PutFile;
-use ApolloPY\Flysystem\AliyunOss\Plugins\SignedDownloadUrl;
+use Xsilen\Flysystem\AliyunOss\Plugins\PutFile;
+use Xsilen\Flysystem\AliyunOss\Plugins\SignedDownloadUrl;
 
 /**
  * Aliyun Oss ServiceProvider class.

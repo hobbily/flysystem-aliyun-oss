@@ -18,7 +18,7 @@
   },
   "autoload": {
     "psr-4": {
-      "ApolloPY\\Flysystem\\AliyunOss\\": "src/"
+      "Xsilen\\Flysystem\\AliyunOss\\": "src/"
     }
   }
 }
