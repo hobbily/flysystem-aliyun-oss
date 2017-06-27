@@ -9,6 +9,7 @@ use League\Flysystem\Config;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\Polyfill\StreamedTrait;
 use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
+use ReflectionClass;
 
 /**
  * Aliyun Oss Adapter class.
@@ -434,35 +435,54 @@ class AliyunOssAdapter extends AbstractAdapter
      *
      * @param string $path
      * @param int    $expires
-     * @param string $host_name
+     * @param string $domain
      * @param bool   $use_ssl
      * @return string
      */
-    public function getSignedDownloadUrl($path, $expires = 3600, $host_name = '', $use_ssl = false)
+    public function getSignedDownloadUrl($path, $expires = 3600, $domain = '', $use_ssl = false)
     {
         $object = $this->applyPathPrefix($path);
         $url = $this->client->signUrl($this->bucket, $object, $expires);
 
-        if (! empty($host_name) || $use_ssl) {
-            $parse_url = parse_url($url);
-            if (! empty($host_name)) {
-                $parse_url['host'] = $this->bucket.'.'.$host_name;
-            }
-            if ($use_ssl) {
-                $parse_url['scheme'] = 'https';
-            }
+        return $this->normalizeUrl($url, $domain, $use_ssl);
+    }
 
-            $url = (isset($parse_url['scheme']) ? $parse_url['scheme'].'://' : '')
-                   .(
-                   isset($parse_url['user']) ?
-                       $parse_url['user'].(isset($parse_url['pass']) ? ':'.$parse_url['pass'] : '').'@'
-                       : ''
-                   )
-                   .(isset($parse_url['host']) ? $parse_url['host'] : '')
-                   .(isset($parse_url['port']) ? ':'.$parse_url['port'] : '')
-                   .(isset($parse_url['path']) ? $parse_url['path'] : '')
-                   .(isset($parse_url['query']) ? '?'.$parse_url['query'] : '');
+    public function getFullUrl($path, $domain = '', $use_ssl = false){
+
+        $object = $this->applyPathPrefix($path);
+
+        return $this->normalizeUrl($object, $domain, $use_ssl);
+    }
+
+    private function normalizeUrl($url, $domin, $use_ssl)
+    {
+        if (empty($domin)) {
+            $class  = new ReflectionClass(get_class($this->client));
+            $method = $class->getMethod("generateHostname");
+            $method->setAccessible(true);
+            $host_name = $method->invoke($this->client, $this->bucket);
+        }else{
+            $host_name = $this->bucket . '.' . $domin;
         }
+
+        $parse_url         = parse_url($url);
+        $parse_url['host'] = $host_name;
+
+        if ($use_ssl) {
+            $parse_url['scheme'] = 'https';
+        }
+
+        $url = (isset($parse_url['scheme']) ? $parse_url['scheme'] . '://' : '')
+               . (
+               isset($parse_url['user']) ?
+                   $parse_url['user'] . (isset($parse_url['pass']) ? ':' . $parse_url['pass'] : '') . '@'
+                   : ''
+               )
+               . (isset($parse_url['host']) ? $parse_url['host'] : '')
+               . (isset($parse_url['port']) ? ':' . $parse_url['port'] : '')
+               . (isset($parse_url['path']) ? $parse_url['path'] : '')
+               . (isset($parse_url['query']) ? '?' . $parse_url['query'] : '');
+
 
         return $url;
     }

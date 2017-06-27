@@ -2,6 +2,7 @@
   "name": "xsilen/flysystem-aliyun-oss",
   "description": "This is a Flysystem adapter for the Aliyun OSS ~2.2.1",
   "license": "MIT",
+  "version": "1.2.1",
   "authors": [
     {
       "name": "xsilen",
