@@ -470,9 +470,11 @@ class AliyunOssAdapter extends AbstractAdapter
 
         if ($use_ssl) {
             $parse_url['scheme'] = 'https';
+        }else{
+            $parse_url['scheme'] = 'http';
         }
 
-        $url = (isset($parse_url['scheme']) ? $parse_url['scheme'] . '://' : '')
+        $url = $parse_url['scheme'] . '://'
                . (
                isset($parse_url['user']) ?
                    $parse_url['user'] . (isset($parse_url['pass']) ? ':' . $parse_url['pass'] : '') . '@'
