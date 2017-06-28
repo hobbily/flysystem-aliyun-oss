@@ -94,12 +94,12 @@ class AliyunOssAdapter extends AbstractAdapter
      */
     public function putFile($path, $localFilePath, Config $config)
     {
-        $object = $this->applyPathPrefix($path);
+        $object  = $this->applyPathPrefix($path);
         $options = $this->getOptionsFromConfig($config);
 
         $options[OssClient::OSS_CHECK_MD5] = true;
 
-        if (! isset($options[OssClient::OSS_CONTENT_TYPE])) {
+        if (!isset($options[OssClient::OSS_CONTENT_TYPE])) {
             $options[OssClient::OSS_CONTENT_TYPE] = Util::guessMimeType($path, '');
         }
 
@@ -109,8 +109,8 @@ class AliyunOssAdapter extends AbstractAdapter
             return false;
         }
 
-        $type = 'file';
-        $result = compact('type', 'path');
+        $type               = 'file';
+        $result             = compact('type', 'path');
         $result['mimetype'] = $options[OssClient::OSS_CONTENT_TYPE];
 
         return $result;
@@ -126,14 +126,14 @@ class AliyunOssAdapter extends AbstractAdapter
      */
     public function write($path, $contents, Config $config)
     {
-        $object = $this->applyPathPrefix($path);
+        $object  = $this->applyPathPrefix($path);
         $options = $this->getOptionsFromConfig($config);
 
-        if (! isset($options[OssClient::OSS_LENGTH])) {
+        if (!isset($options[OssClient::OSS_LENGTH])) {
             $options[OssClient::OSS_LENGTH] = Util::contentSize($contents);
         }
 
-        if (! isset($options[OssClient::OSS_CONTENT_TYPE])) {
+        if (!isset($options[OssClient::OSS_CONTENT_TYPE])) {
             $options[OssClient::OSS_CONTENT_TYPE] = Util::guessMimeType($path, $contents);
         }
 
@@ -143,10 +143,10 @@ class AliyunOssAdapter extends AbstractAdapter
             return false;
         }
 
-        $type = 'file';
-        $result = compact('type', 'path', 'contents');
+        $type               = 'file';
+        $result             = compact('type', 'path', 'contents');
         $result['mimetype'] = $options[OssClient::OSS_CONTENT_TYPE];
-        $result['size'] = $options[OssClient::OSS_LENGTH];
+        $result['size']     = $options[OssClient::OSS_LENGTH];
 
         return $result;
     }
@@ -173,7 +173,7 @@ class AliyunOssAdapter extends AbstractAdapter
      */
     public function rename($path, $newpath)
     {
-        if (! $this->copy($path, $newpath)) {
+        if (!$this->copy($path, $newpath)) {
             return false;
         }
 
@@ -189,7 +189,7 @@ class AliyunOssAdapter extends AbstractAdapter
      */
     public function copy($path, $newpath)
     {
-        $object = $this->applyPathPrefix($path);
+        $object    = $this->applyPathPrefix($path);
         $newobject = $this->applyPathPrefix($newpath);
 
         try {
@@ -235,7 +235,7 @@ class AliyunOssAdapter extends AbstractAdapter
             if ($val['type'] === 'file') {
                 $objects[] = $this->applyPathPrefix($val['path']);
             } else {
-                $objects[] = $this->applyPathPrefix($val['path']).'/';
+                $objects[] = $this->applyPathPrefix($val['path']) . '/';
             }
         }
 
@@ -257,7 +257,7 @@ class AliyunOssAdapter extends AbstractAdapter
      */
     public function createDir($dirname, Config $config)
     {
-        $object = $this->applyPathPrefix($dirname);
+        $object  = $this->applyPathPrefix($dirname);
         $options = $this->getOptionsFromConfig($config);
 
         try {
@@ -317,13 +317,15 @@ class AliyunOssAdapter extends AbstractAdapter
     public function listContents($directory = '', $recursive = false)
     {
         $directory = rtrim($this->applyPathPrefix($directory), '\\/');
-        if ($directory) $directory.='/';
+        if ($directory) {
+            $directory .= '/';
+        }
 
-        $bucket = $this->bucket;
-        $delimiter = '/';
+        $bucket     = $this->bucket;
+        $delimiter  = '/';
         $nextMarker = '';
-        $maxkeys = 1000;
-        $options = [
+        $maxkeys    = 1000;
+        $options    = [
             'delimiter' => $delimiter,
             'prefix'    => $directory,
             'max-keys'  => $maxkeys,
@@ -356,7 +358,7 @@ class AliyunOssAdapter extends AbstractAdapter
 
         foreach ($prefixList as $prefixInfo) {
             if ($recursive) {
-                $next = $this->listContents($this->removePathPrefix($prefixInfo->getPrefix()), $recursive);
+                $next   = $this->listContents($this->removePathPrefix($prefixInfo->getPrefix()), $recursive);
                 $result = array_merge($result, $next);
             } else {
                 $result[] = [
@@ -442,12 +444,13 @@ class AliyunOssAdapter extends AbstractAdapter
     public function getSignedDownloadUrl($path, $expires = 3600, $domain = '', $use_ssl = false)
     {
         $object = $this->applyPathPrefix($path);
-        $url = $this->client->signUrl($this->bucket, $object, $expires);
+        $url    = $this->client->signUrl($this->bucket, $object, $expires);
 
         return $this->normalizeUrl($url, $domain, $use_ssl);
     }
 
-    public function getFullUrl($path, $domain = '', $use_ssl = false){
+    public function getFullUrl($path, $domain = '', $use_ssl = false)
+    {
 
         $object = $this->applyPathPrefix($path);
 
@@ -456,21 +459,20 @@ class AliyunOssAdapter extends AbstractAdapter
 
     private function normalizeUrl($url, $domin, $use_ssl)
     {
-        if (empty($domin)) {
+        $parse_url = parse_url($url);
+
+        if (!empty($domin)) {
+            $parse_url['host'] = $this->bucket . '.' . $domin;
+        } elseif (empty($parse_url['host'])) {
             $class  = new ReflectionClass(get_class($this->client));
             $method = $class->getMethod("generateHostname");
             $method->setAccessible(true);
-            $host_name = $method->invoke($this->client, $this->bucket);
-        }else{
-            $host_name = $this->bucket . '.' . $domin;
+            $parse_url['host'] = $method->invoke($this->client, $this->bucket);
         }
-
-        $parse_url         = parse_url($url);
-        $parse_url['host'] = $host_name;
 
         if ($use_ssl) {
             $parse_url['scheme'] = 'https';
-        }else{
+        } else {
             $parse_url['scheme'] = 'http';
         }
 
@@ -482,7 +484,9 @@ class AliyunOssAdapter extends AbstractAdapter
                )
                . (isset($parse_url['host']) ? $parse_url['host'] : '')
                . (isset($parse_url['port']) ? ':' . $parse_url['port'] : '')
-               . (isset($parse_url['path']) ? $parse_url['path'] : '')
+               . (isset($parse_url['path']) ?
+                (substr($parse_url['path'], 0, 1) == '/' ? $parse_url['path'] : '/' . $parse_url['path'])
+                : '/')
                . (isset($parse_url['query']) ? '?' . $parse_url['query'] : '');
 
 
@@ -499,7 +503,7 @@ class AliyunOssAdapter extends AbstractAdapter
     {
         $options = $this->options;
         foreach (static::$mappingOptions as $option => $ossOption) {
-            if (! $config->has($option)) {
+            if (!$config->has($option)) {
                 continue;
             }
             $options[$ossOption] = $config->get($option);
