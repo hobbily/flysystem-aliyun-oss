@@ -6,6 +6,7 @@ use Storage;
 use OSS\OssClient;
 use League\Flysystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
+use Xsilen\Flysystem\AliyunOss\Plugins\FullUrl;
 use Xsilen\Flysystem\AliyunOss\Plugins\PutFile;
 use Xsilen\Flysystem\AliyunOss\Plugins\SignedDownloadUrl;
 
@@ -40,6 +41,7 @@ class AliyunOssServiceProvider extends ServiceProvider
             $filesystem = new Filesystem($adapter);
             $filesystem->addPlugin(new PutFile());
             $filesystem->addPlugin(new SignedDownloadUrl());
+            $filesystem->addPlugin(new FullUrl());
 
             return $filesystem;
         });
