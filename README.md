@@ -9,19 +9,22 @@ inspire by [apollopy/flysystem-aliyun-oss](https://github.com/apollopy/flysystem
 ## Installation
 
 ```bash
-composer require xsilen/flysystem-aliyun-oss
+composer require gradii/flysystem-aliyun-oss
 ```
 
 ## for Laravel
 
 This service provider must be registered.
 
+In order to be compatible to prev `xsilen/flysystem-aliyun-oss`, i have not change namespace
+start with `Gradii`
+
 ```php
 // config/app.php
 
 'providers' => [
     '...',
-    ApolloPY\Flysystem\AliyunOss\AliyunOssServiceProvider::class,
+    Xsilen\Flysystem\AliyunOss\AliyunOssServiceProvider::class,
 ];
 ```
 
@@ -32,10 +35,17 @@ add config
 ```php
 'oss' => [
     'driver'     => 'oss',
-    'access_id'  => env('OSS_ACCESS_ID','your id'),
-    'access_key' => env('OSS_ACCESS_KEY','your key'),
-    'bucket'     => env('OSS_BUCKET','your bucket'),
-    'endpoint'   => env('OSS_ENDPOINT','your endpoint'),
+    'access_id'  => env('ALIYUN_OSS_ACCESS_KEY_ID'),
+    'access_key' => env('ALIYUN_OSS_ACCESS_KEY_SECRET'),
+    'bucket'     => env('ALIYUN_OSS_BUCKET_NAME'),
+    //使用endpoint来上传oss文件, 如果是OSS内网上传, 刚将OSS内网地址填在此处
+    'endpoint'   => env('ALIYUN_OSS_ENDPOINT'),
+    'cdnDomain'  => env('ALIYUN_OSS_MARKET_CDN_DOMAIN', env('ALIYUN_OSS_CDN_DOMAIN')),
+    // true to use 'https://' and false to use 'http://'. default is false,
+    'ssl'        => true,
+    // 如果isCName为true, getUrl会判断cdnDomain是否设定来决定返回的url，如果cdnDomain未设置，则使用endpoint来生成url，否则使用cdn
+    // 而且, 上传将会用endpoint来上传, 读取将会用cdnDomain来读取
+    'isCName'    => true,
     'prefix'     => env('OSS_PREFIX', ''), // optional
 ],
 ```
@@ -56,7 +66,8 @@ inspire by [itbdw/laravel-storage-qiniu](https://github.com/itbdw/laravel-storag
 
 ```php
 Storage::disk('oss')->putFile($path, '/local_file_path/1.png', ['mimetype' => 'image/png']);
-Storage::disk('oss')->signedDownloadUrl($path, 3600, 'oss-cn-beijing.aliyuncs.com', true);
+Storage::disk('oss')->signedDownloadUrl($path, 3600, /*可强制写cdnDomain*/'oss-cn-beijing.aliyuncs.com', true);
+Storage::disk('oss')->fullUrl($path, /*可强制写cdnDomain*/'oss-cn-beijing.aliyuncs.com', true);
 ```
 
 ## IDE Helper
@@ -67,6 +78,6 @@ edit the config file: config/ide-helper.php
 
 ```php
 'interfaces'      => [
-    '\Illuminate\Contracts\Filesystem\Filesystem' => ApolloPY\Flysystem\AliyunOss\FilesystemAdapter::class,
+    '\Illuminate\Contracts\Filesystem\Filesystem' => Xsilen\Flysystem\AliyunOss\FilesystemAdapter::class,
 ],
 ```
