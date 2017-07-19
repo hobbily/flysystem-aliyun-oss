@@ -40,7 +40,7 @@ add config
     'bucket'     => env('ALIYUN_OSS_BUCKET_NAME'),
     //使用endpoint来上传oss文件, 如果是OSS内网上传, 刚将OSS内网地址填在此处
     'endpoint'   => env('ALIYUN_OSS_ENDPOINT'),
-    'cdnDomain'  => env('ALIYUN_OSS_MARKET_CDN_DOMAIN', env('ALIYUN_OSS_CDN_DOMAIN')),
+    'cdnDomain'  => env('ALIYUN_OSS_CDN_DOMAIN'),
     // true to use 'https://' and false to use 'http://'. default is false,
     'ssl'        => true,
     // 如果isCName为true, getUrl会判断cdnDomain是否设定来决定返回的url，如果cdnDomain未设置，则使用endpoint来生成url，否则使用cdn
