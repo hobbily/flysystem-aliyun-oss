@@ -484,15 +484,13 @@ class AliyunOssAdapter extends AbstractAdapter
 
         if (!empty($domin)) {
             $parse_url['host'] = $this->bucket . '.' . $domin;
-        } elseif (empty($parse_url['host'])) {
-            if ($this->isCName && $this->cdnDomain) {
-                $parse_url['host'] = $this->bucket . '.' . $this->cdnDomain;
-            } else {
-                $class  = new ReflectionClass(get_class($this->client));
-                $method = $class->getMethod("generateHostname");
-                $method->setAccessible(true);
-                $parse_url['host'] = $method->invoke($this->client, $this->bucket);
-            }
+        } elseif ($this->isCName && $this->cdnDomain) {
+            $parse_url['host'] = $this->bucket . '.' . $this->cdnDomain;
+        } else {
+            $class  = new ReflectionClass(get_class($this->client));
+            $method = $class->getMethod("generateHostname");
+            $method->setAccessible(true);
+            $parse_url['host'] = $method->invoke($this->client, $this->bucket);
         }
 
         if ($use_ssl === null) {
