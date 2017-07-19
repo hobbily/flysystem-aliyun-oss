@@ -31,7 +31,7 @@ class SignedDownloadUrl extends AbstractPlugin
      * @param bool   $use_ssl
      * @return string|false
      */
-    public function handle($path, $expires = 3600, $host_name = '', $use_ssl = false)
+    public function handle($path, $expires = 3600, $host_name = '', $use_ssl = null)
     {
         if (! method_exists($this->filesystem, 'getAdapter')) {
             return false;
