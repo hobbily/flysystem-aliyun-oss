@@ -35,6 +35,12 @@ class AliyunOssAdapter extends AbstractAdapter
      */
     protected $bucket;
 
+    protected $ssl;
+
+    protected $isCName;
+
+    protected $cdnDomain;
+
     /**
      * @var array
      */
@@ -54,13 +60,28 @@ class AliyunOssAdapter extends AbstractAdapter
      * @param OssClient $client
      * @param string    $bucket
      * @param string    $prefix
+     * @param           $ssl
+     * @param           $isCName
+     * @param           $cdnDomain
      * @param array     $options
      */
-    public function __construct(OssClient $client, $bucket, $prefix = null, array $options = [])
-    {
-        $this->client = $client;
-        $this->bucket = $bucket;
+    public function __construct(
+        OssClient $client,
+        $bucket,
+        $prefix = null,
+        $ssl,
+        $isCName,
+        $cdnDomain,
+        array $options = []
+    ) {
+        $this->client    = $client;
+        $this->bucket    = $bucket;
+        $this->ssl       = $ssl;
+        $this->isCName   = $isCName;
+        $this->cdnDomain = $cdnDomain;
+
         $this->setPathPrefix($prefix);
+
         $this->options = array_merge($this->options, $options);
     }
 
@@ -441,7 +462,7 @@ class AliyunOssAdapter extends AbstractAdapter
      * @param bool   $use_ssl
      * @return string
      */
-    public function getSignedDownloadUrl($path, $expires = 3600, $domain = '', $use_ssl = false)
+    public function getSignedDownloadUrl($path, $expires = 3600, $domain = '', $use_ssl = null)
     {
         $object = $this->applyPathPrefix($path);
         $url    = $this->client->signUrl($this->bucket, $object, $expires);
@@ -449,7 +470,7 @@ class AliyunOssAdapter extends AbstractAdapter
         return $this->normalizeUrl($url, $domain, $use_ssl);
     }
 
-    public function getFullUrl($path, $domain = '', $use_ssl = false)
+    public function getFullUrl($path, $domain = '', $use_ssl = null)
     {
 
         $object = $this->applyPathPrefix($path);
@@ -462,7 +483,11 @@ class AliyunOssAdapter extends AbstractAdapter
         $parse_url = parse_url($url);
 
         if (!empty($domin)) {
-            $parse_url['host'] = $this->bucket . '.' . $domin;
+            if($this->isCName && $this->cdnDomain) {
+                $parse_url['host'] = $this->bucket . '.' . $this->cdnDomain;
+            }else{
+                $parse_url['host'] = $this->bucket . '.' . $domin;
+            }
         } elseif (empty($parse_url['host'])) {
             $class  = new ReflectionClass(get_class($this->client));
             $method = $class->getMethod("generateHostname");
@@ -470,10 +495,10 @@ class AliyunOssAdapter extends AbstractAdapter
             $parse_url['host'] = $method->invoke($this->client, $this->bucket);
         }
 
-        if ($use_ssl) {
-            $parse_url['scheme'] = 'https';
+        if ($use_ssl === null) {
+            $parse_url['scheme'] = $this->ssl ? 'https' : 'http';
         } else {
-            $parse_url['scheme'] = 'http';
+            $parse_url['scheme'] = $use_ssl ? 'https' : 'http';
         }
 
         $url = $parse_url['scheme'] . '://'
