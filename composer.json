@@ -1,8 +1,8 @@
 {
-  "name": "xsilen/flysystem-aliyun-oss",
+  "name": "gradii/flysystem-aliyun-oss",
   "description": "This is a Flysystem adapter for the Aliyun OSS ~2.2.1",
   "license": "MIT",
-  "version": "1.3",
+  "version": "2.0.0",
   "authors": [
     {
       "name": "xsilen",

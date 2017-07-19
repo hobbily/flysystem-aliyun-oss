@@ -5,8 +5,8 @@ namespace Xsilen\Flysystem\AliyunOss\Tests;
 use OSS\OssClient;
 use PHPUnit_Framework_TestCase;
 use League\Flysystem\Filesystem;
-use ApolloPY\Flysystem\AliyunOss\Plugins\PutFile;
-use ApolloPY\Flysystem\AliyunOss\AliyunOssAdapter;
+use Xsilen\Flysystem\AliyunOss\Plugins\PutFile;
+use Xsilen\Flysystem\AliyunOss\AliyunOssAdapter;
 
 class AliyunOssAdapterTest extends PHPUnit_Framework_TestCase
 {
